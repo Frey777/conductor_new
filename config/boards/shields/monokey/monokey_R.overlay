@@ -51,10 +51,8 @@
         compatible = "zmk,input-listener";
         device = <&trackball>;
 
-        /* ベース: オートマウスレイヤー (AML)
-         * トラックボール操作時にレイヤー4 (MOUSE) を自動有効化
-         * 60000ms (60秒) のタイムアウトで自動解除 */
-        input-processors = <&zip_temp_layer 4 60000>;
+        /* TEST: AML timeout reverted to v0.4.0 value (5000ms) */
+        input-processors = <&zip_temp_layer 4 5000>;
 
         /* スクロールレイヤー: レイヤー5 (SCROLL) がアクティブ時
          * XY移動をスクロールホイールに変換
@@ -107,7 +105,7 @@
         spi-max-frequency = <2000000>;
         irq-gpios = <&gpio0 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
         cpi = <800>;
-        force-awake;
+        /* TEST: force-awake removed (v0.4.2 introduction reverted) */
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
