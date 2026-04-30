@@ -107,7 +107,12 @@
         spi-max-frequency = <2000000>;
         irq-gpios = <&gpio0 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
         cpi = <800>;
-        force-awake;
+        /* force-awake removed for battery-only hang investigation.
+         * Hypothesis: keeping the sensor in RUN mode 24/7 (3mA) on
+         * battery causes cumulative SPI/IRQ activity that wedges some
+         * subsystem after 30min~1h. USB-powered operation never showed
+         * the issue because Zephyr PM stays ACTIVE there anyway. */
+        // force-awake;
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
