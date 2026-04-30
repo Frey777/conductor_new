@@ -82,22 +82,19 @@
         };
     };
 
-    spi0_sleep: spi0_sleep {
-        group1 {
-            psels = <NRF_PSEL(SPIM_SCK, 0, 5)>,
-                <NRF_PSEL(SPIM_MOSI, 0, 4)>,
-                <NRF_PSEL(SPIM_MISO, 0, 4)>;
-            low-power-enable;
-        };
-    };
+    /* TEST: spi0_sleep state removed.
+     * 3-wire SPI (MOSI=MISO same pin) + low-power-enable causes a race in
+     * Zephyr's pinctrl PM during PMW3610 suspend/resume on battery
+     * (USB-powered systems never enter the long suspend windows that trigger
+     * the race). See subagent investigation 2026-04-30. */
 };
 
 &spi0 {
     status = "okay";
     compatible = "nordic,nrf-spim";
     pinctrl-0 = <&spi0_default>;
-    pinctrl-1 = <&spi0_sleep>;
-    pinctrl-names = "default", "sleep";
+    /* TEST: pinctrl-1 sleep state removed (was &spi0_sleep) */
+    pinctrl-names = "default";
     cs-gpios = <&gpio0 9 GPIO_ACTIVE_LOW>;
 
     trackball: trackball@0 {
