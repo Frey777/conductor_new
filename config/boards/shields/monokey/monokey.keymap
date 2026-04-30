@@ -21,6 +21,23 @@
             timeout-ms = <51>;
         };
 
+        /* TEST: BLE force output via combo (works regardless of layer).
+         * Q (pos 0) + P (pos 9) — both hands, far apart, never accidentally
+         * triggered by typing. Press both within 50ms.
+         */
+        ble_force {
+            bindings = <&out OUT_BLE>;
+            key-positions = <0 9>;
+            timeout-ms = <50>;
+        };
+
+        /* USB force (revert) — TAB (pos 30) + Vol+ (pos 39), bottom corners */
+        usb_force {
+            bindings = <&out OUT_USB>;
+            key-positions = <30 39>;
+            timeout-ms = <50>;
+        };
+
     };
 
     keymap {
