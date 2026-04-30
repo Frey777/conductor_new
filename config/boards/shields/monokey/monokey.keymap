@@ -28,14 +28,14 @@
         ble_force {
             bindings = <&out OUT_BLE>;
             key-positions = <0 9>;
-            timeout-ms = <50>;
+            timeout-ms = <300>;
         };
 
         /* USB force (revert) — TAB (pos 30) + Vol+ (pos 39), bottom corners */
         usb_force {
             bindings = <&out OUT_USB>;
             key-positions = <30 39>;
-            timeout-ms = <50>;
+            timeout-ms = <300>;
         };
 
     };
