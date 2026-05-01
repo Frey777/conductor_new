@@ -83,9 +83,10 @@ static const struct device *chg_dev;
 static const struct device *ledr_dev, *ledg_dev, *ledb_dev;
 #endif
 static struct gpio_callback chg_cb;
+static struct k_work_delayable chg_debounce_work;
 
 /* Maintenance thread: reapply charging state periodically to suppress widget while charging. */
-K_THREAD_STACK_DEFINE(chg_maint_stack, 512);
+K_THREAD_STACK_DEFINE(chg_maint_stack, 1024);
 static struct k_thread chg_maint_thread;
 
 /* Common-anode RGB (gpio-leds with GPIO_ACTIVE_LOW): write logical 1 to turn LED ON. */
@@ -207,12 +208,20 @@ static void apply_state(void)
 }
 
 /* IRQ handler: short debounce -> read raw -> update state -> apply behavior. */
-static void chg_handler(const struct device *port, struct gpio_callback *cb, uint32_t pins)
+static void chg_debounce_handler(struct k_work *work)
 {
-    k_sleep(K_MSEC(8));
     bool charging = read_charging();
     atomic_set(&is_charging, charging);
     apply_state();
+}
+
+static void chg_handler(const struct device *port, struct gpio_callback *cb, uint32_t pins)
+{
+    ARG_UNUSED(port);
+    ARG_UNUSED(cb);
+    ARG_UNUSED(pins);
+
+    k_work_reschedule(&chg_debounce_work, K_MSEC(8));
 }
 
 /* Battery state changed event handler: refresh low-battery flag and reapply. */
@@ -328,6 +337,8 @@ static int charge_indicator_init(void)
     update_low_battery();
 #endif
     apply_state();
+
+    k_work_init_delayable(&chg_debounce_work, chg_debounce_handler);
 
     /* IRQ on both edges. */
     ret = gpio_pin_interrupt_configure(chg_dev, CHG_PIN_NUM, GPIO_INT_EDGE_BOTH);
